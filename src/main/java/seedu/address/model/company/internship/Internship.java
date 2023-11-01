@@ -15,7 +15,6 @@ public class Internship {
 
     public final InternshipName roleName;
     public final InternshipDescription description;
-
     // Internship may or may not have an interviewDateTime.
     public final Optional<InternshipInterviewDateTime> interviewDateTime;
 
@@ -73,6 +72,19 @@ public class Internship {
      */
     public InternshipDescription getInternshipDesc() {
         return this.description;
+    }
+
+    /**
+     * Returns true if both internships have the same name.
+     * This defines a weaker notion of equality between two internships.
+     */
+    public boolean isSameInternship(Internship otherInternship) {
+        if (otherInternship == this) {
+            return true;
+        }
+
+        return otherInternship != null
+                && otherInternship.getInternshipName().equals(getInternshipName());
     }
 
     /**

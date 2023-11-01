@@ -2,7 +2,7 @@ package seedu.address.logic.commands.clearcommands;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 
 import seedu.address.commons.core.index.Index;
@@ -17,7 +17,7 @@ import seedu.address.model.company.Company;
  * Clears the internship list of a specific company.
  */
 public class ClearInternshipCommand extends ClearCommand {
-    public static final String MESSAGE_SUCCESS = "Internship list of Company %1$s has been cleared!";
+    public static final String MESSAGE_SUCCESS = "Internship list of company %1$s has been cleared!";
 
     private final Index targetIndex;
 
@@ -43,12 +43,12 @@ public class ClearInternshipCommand extends ClearCommand {
         Company updatedCompany = new Company(companyToDelete.getCompanyName(),
                 companyToDelete.getCompanyPhone(), companyToDelete.getCompanyEmail(),
                 companyToDelete.getCompanyDescription(), companyToDelete.getTags(),
-                new HashSet<>());
+                new ArrayList<>());
 
         model.setCompany(companyToDelete, updatedCompany);
         model.updateFilteredCompanyList(Model.PREDICATE_SHOW_ALL_COMPANIES);
 
-        return new RegularCommandResult(String.format(MESSAGE_SUCCESS, targetIndex));
+        return new RegularCommandResult(String.format(MESSAGE_SUCCESS, companyToDelete.getCompanyName()));
     }
 
     @Override

@@ -1,5 +1,6 @@
 package seedu.address.logic.commands.clearcommands;
 
+import static seedu.address.testutil.TypicalCompanies.APPLE;
 import static seedu.address.testutil.TypicalCompanies.getTypicalAddressBook;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON_OR_COMPANY;
 
@@ -29,7 +30,7 @@ public class ClearInternshipCommandTest {
         ClearInternshipCommand clearInternshipCommand = new ClearInternshipCommand(INDEX_FIRST_PERSON_OR_COMPANY);
 
         String expectedMessage = String.format(
-                ClearInternshipCommand.MESSAGE_SUCCESS, INDEX_FIRST_PERSON_OR_COMPANY);
+                ClearInternshipCommand.MESSAGE_SUCCESS, APPLE.getCompanyName());
         Model expectedModel = model;
         CommandTestUtil.assertRegularCommandSuccess(clearInternshipCommand, model, expectedMessage, expectedModel);
 

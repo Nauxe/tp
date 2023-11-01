@@ -41,7 +41,7 @@ public class JsonAdaptedCompanyTest {
             .map(JsonAdaptedTag::new)
             .collect(Collectors.toList());
 
-    private static final List<JsonAdaptedInternship> VALID_INTERNSHIPS = MICROSOFT.getInternships().stream()
+    private static final List<JsonAdaptedInternship> VALID_INTERNSHIPS = MICROSOFT.getInternshipList().stream()
             .map(JsonAdaptedInternship::new)
             .collect(Collectors.toList());
 

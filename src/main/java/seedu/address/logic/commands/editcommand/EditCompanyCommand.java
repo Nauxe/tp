@@ -88,8 +88,7 @@ public class EditCompanyCommand extends EditCommand {
                 editCompanyDescriptor.getDescription().orElse(companyToEdit.getCompanyDescription());
         Set<Tag> updatedTags =
                 editCompanyDescriptor.getTags().orElse(companyToEdit.getTags());
-        Set<Internship> updatedInternships =
-                editCompanyDescriptor.getInternships().orElse(companyToEdit.getInternships());
+        List<Internship> updatedInternships = companyToEdit.getInternshipList();
 
         return new Company(updatedCompanyName, updatedCompanyPhone,
                 updatedCompanyEmail, updatedCompanyDescription, updatedTags, updatedInternships);
@@ -129,7 +128,6 @@ public class EditCompanyCommand extends EditCommand {
         private CompanyEmail companyEmail;
         private CompanyDescription companyDescription;
         private Set<Tag> tags;
-        private Set<Internship> internships;
 
         public EditCompanyDescriptor() {}
 
@@ -143,7 +141,6 @@ public class EditCompanyCommand extends EditCommand {
             setCompanyEmail(toCopy.companyEmail);
             setDescription(toCopy.companyDescription);
             setTags(toCopy.tags);
-            setInternships(toCopy.internships);
         }
 
         /**
@@ -203,23 +200,6 @@ public class EditCompanyCommand extends EditCommand {
             return (tags != null) ? Optional.of(Collections.unmodifiableSet(tags)) : Optional.empty();
         }
 
-        /**
-         * Sets {@code internships} to this object's {@code internships}.
-         * A defensive copy of {@code internships} is used internally.
-         */
-        public void setInternships(Set<Internship> internships) {
-            this.internships = (internships != null) ? new HashSet<>(internships) : null;
-        }
-
-        /**
-         * Returns an unmodifiable tag set, which throws {@code UnsupportedOperationException}
-         * if modification is attempted.
-         * Returns {@code Optional#empty()} if {@code internships} is null.
-         */
-        public Optional<Set<Internship>> getInternships() {
-            return (internships != null) ? Optional.of(Collections.unmodifiableSet(internships)) : Optional.empty();
-        }
-
         @Override
         public boolean equals(Object other) {
             if (other == this) {
@@ -236,8 +216,7 @@ public class EditCompanyCommand extends EditCommand {
                     && Objects.equals(companyPhone, otherEditCompanyDescriptor.companyPhone)
                     && Objects.equals(companyEmail, otherEditCompanyDescriptor.companyEmail)
                     && Objects.equals(companyDescription, otherEditCompanyDescriptor.companyDescription)
-                    && Objects.equals(tags, otherEditCompanyDescriptor.tags)
-                    && Objects.equals(internships, otherEditCompanyDescriptor.internships);
+                    && Objects.equals(tags, otherEditCompanyDescriptor.tags);
         }
 
         @Override
@@ -248,7 +227,6 @@ public class EditCompanyCommand extends EditCommand {
                     .add("email", companyEmail)
                     .add("companyDescription", companyDescription)
                     .add("tags", tags)
-                    .add("internships", internships)
                     .toString();
         }
     }

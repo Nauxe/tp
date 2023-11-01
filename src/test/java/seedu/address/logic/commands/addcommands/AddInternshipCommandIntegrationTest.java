@@ -8,9 +8,8 @@ import static seedu.address.logic.commands.CommandTestUtil.assertPersonCommandFa
 import static seedu.address.testutil.TypicalCompanies.getTypicalAddressBook;
 import static seedu.address.testutil.TypicalInternships.SOFTWARE_ENGINEER_WITH_DATETIME;
 
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,13 +39,20 @@ public class AddInternshipCommandIntegrationTest {
     @Test
     public void execute_newInternshipCompanyNoInternships_success() {
         Internship validInternship = new InternshipBuilder().build();
-
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+
+        // Getting the company and its internships.
         List<Company> lastShownList = expectedModel.getFilteredCompanyList();
-        Company companyToAddTo = lastShownList.get(3);
-        Set<Internship> updatedInternships = new HashSet<>();
+        Company referencedCompany = lastShownList.get(3);
+        List<Internship> updatedInternships = new ArrayList<>();
         updatedInternships.add(validInternship);
-        Company updatedCompany = new CompanyBuilder(companyToAddTo).withInternships(updatedInternships).build();
+
+        // Make copies of the referencedCompany at the index 2.
+        Company companyToAddTo = new CompanyBuilder(referencedCompany).build();
+        Company updatedCompany = new CompanyBuilder(referencedCompany).withInternships(updatedInternships).build();
+
+        // Set to copy of the company, so that it does not affect the actual company.
+        model.setCompany(referencedCompany, companyToAddTo);
         expectedModel.setCompany(companyToAddTo, updatedCompany);
 
         CommandTestUtil.assertRegularCommandSuccess(
@@ -61,13 +67,20 @@ public class AddInternshipCommandIntegrationTest {
     @Test
     public void execute_newInternshipCompanyWithInternships_success() {
         Internship validInternship = new InternshipBuilder().build();
-
         Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+
+        // Getting the company and its internships.
         List<Company> lastShownList = expectedModel.getFilteredCompanyList();
-        Company companyToAddTo = lastShownList.get(2);
-        Set<Internship> updatedInternships = new HashSet<>(companyToAddTo.getInternships());
-        updatedInternships.add(validInternship);
-        Company updatedCompany = new CompanyBuilder(companyToAddTo).withInternships(updatedInternships).build();
+        Company referencedCompany = lastShownList.get(2);
+        List<Internship> existingInternships = referencedCompany.getInternshipList();
+
+        // Make copies of the referencedCompany at the index 2.
+        Company companyToAddTo = new CompanyBuilder(referencedCompany).build();
+        Company updatedCompany = new CompanyBuilder(referencedCompany).build();
+        updatedCompany.addInternship(validInternship);
+
+        // Set to copy of the company, so that it does not affect the actual company.
+        model.setCompany(referencedCompany, companyToAddTo);
         expectedModel.setCompany(companyToAddTo, updatedCompany);
 
         CommandTestUtil.assertRegularCommandSuccess(

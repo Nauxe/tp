@@ -24,6 +24,7 @@ import seedu.address.model.tag.Tag;
 class JsonAdaptedCompany {
 
     public static final String MISSING_FIELD_MESSAGE_FORMAT = "Company's %s field is missing!";
+    public static final String MESSAGE_DUPLICATE_INTERNSHIP = "There are duplicate internship/internships.";
 
     private final String companyName;
     private final String phone;
@@ -63,7 +64,7 @@ class JsonAdaptedCompany {
         tags.addAll(source.getTags().stream()
                 .map(JsonAdaptedTag::new)
                 .collect(Collectors.toList()));
-        internships.addAll(source.getInternships().stream()
+        internships.addAll(source.getInternshipList().stream()
                 .map(JsonAdaptedInternship::new)
                 .collect(Collectors.toList()));
     }
@@ -81,10 +82,6 @@ class JsonAdaptedCompany {
             companyTags.add(tag.toModelType());
         }
 
-        for (JsonAdaptedInternship internship : internships) {
-            companyInternships.add(internship.toModelType());
-        }
-
         if (companyName == null) {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT,
                     CompanyName.class.getSimpleName()));
@@ -98,9 +95,11 @@ class JsonAdaptedCompany {
             throw new IllegalValueException(
                     String.format(MISSING_FIELD_MESSAGE_FORMAT, CompanyPhone.class.getSimpleName()));
         }
+
         if (!CompanyPhone.isValidPhone(phone)) {
             throw new IllegalValueException(CompanyPhone.MESSAGE_CONSTRAINTS);
         }
+
         final CompanyPhone modelPhone = new CompanyPhone(phone);
 
         if (email == null) {
@@ -116,14 +115,26 @@ class JsonAdaptedCompany {
             throw new IllegalValueException(String.format(MISSING_FIELD_MESSAGE_FORMAT,
                     CompanyDescription.class.getSimpleName()));
         }
+
         if (!CompanyDescription.isValidCompanyDescription(description)) {
             throw new IllegalValueException(CompanyDescription.MESSAGE_CONSTRAINTS);
         }
+
         final CompanyDescription modelDesc = new CompanyDescription(description);
 
         final Set<Tag> modelTags = new HashSet<>(companyTags);
-        final Set<Internship> modelInternships = new HashSet<>(companyInternships);
-        return new Company(modelName, modelPhone, modelEmail, modelDesc, modelTags, modelInternships);
+
+        Company companyToReturn = new Company(modelName, modelPhone, modelEmail, modelDesc, modelTags);
+
+        for (JsonAdaptedInternship jsonInternship : internships) {
+            Internship internship = jsonInternship.toModelType();
+            if (companyToReturn.hasInternship(internship)) {
+                throw new IllegalValueException(MESSAGE_DUPLICATE_INTERNSHIP);
+            }
+            companyToReturn.addInternship(internship);
+        }
+
+        return companyToReturn;
     }
 
 }

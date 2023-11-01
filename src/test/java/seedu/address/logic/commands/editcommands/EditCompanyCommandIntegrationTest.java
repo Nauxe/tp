@@ -28,6 +28,7 @@ import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.company.Company;
+import seedu.address.model.company.internship.Internship;
 import seedu.address.testutil.CompanyBuilder;
 import seedu.address.testutil.EditCompanyDescriptorBuilder;
 
@@ -40,7 +41,13 @@ public class EditCompanyCommandIntegrationTest {
 
     @Test
     public void execute_allFieldsSpecifiedUnfilteredList_success() {
+        Company companyToEdit = model.getFilteredCompanyList().get(0);
         Company editedCompany = new CompanyBuilder().build();
+
+        for (Internship i : companyToEdit.getInternshipList()) {
+            editedCompany.addInternship(i);
+        }
+
         EditCompanyDescriptor descriptor = new EditCompanyDescriptorBuilder(editedCompany).build();
         EditCompanyCommand editCompanyCommand = new EditCompanyCommand(INDEX_FIRST_PERSON_OR_COMPANY, descriptor);
 

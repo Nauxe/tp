@@ -3,9 +3,7 @@ package seedu.address.logic.commands.addcommands;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.ToStringBuilder;
@@ -49,21 +47,12 @@ public class AddInternshipCommand extends AddCommand {
         }
 
         Company companyToAddTo = lastShownList.get(index.getZeroBased());
-        Set<Internship> currInternships = companyToAddTo.getInternships();
-        if (currInternships.contains(internship)) {
+
+        if (companyToAddTo.hasInternship(internship)) {
             throw new CommandException(MESSAGE_DUPLICATE_INTERNSHIP);
         }
 
-        Set<Internship> updatedInternships = new HashSet<>(currInternships);
-        updatedInternships.add(internship);
-
-        Company updatedCompany = new Company(companyToAddTo.getCompanyName(),
-                companyToAddTo.getCompanyPhone(), companyToAddTo.getCompanyEmail(),
-                companyToAddTo.getCompanyDescription(), companyToAddTo.getTags(),
-                updatedInternships);
-
-        model.setCompany(companyToAddTo, updatedCompany);
-        model.updateFilteredCompanyList(Model.PREDICATE_SHOW_ALL_COMPANIES);
+        companyToAddTo.addInternship(internship);
         return new RegularCommandResult(String.format(MESSAGE_SUCCESS, Messages.formatInternship(internship)));
     }
 

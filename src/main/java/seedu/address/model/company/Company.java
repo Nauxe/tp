@@ -2,20 +2,19 @@ package seedu.address.model.company;
 
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.company.internship.Internship;
 import seedu.address.model.company.internship.InternshipInterviewDateTime;
+import seedu.address.model.company.internship.UniqueInternshipList;
 import seedu.address.model.tag.Tag;
 
 /**
@@ -23,7 +22,6 @@ import seedu.address.model.tag.Tag;
  * Guarantees: details are present and not null, field values are validated, immutable.
  */
 public class Company {
-
     // Identity fields
     private final CompanyName companyName;
     private final CompanyPhone phone;
@@ -32,21 +30,42 @@ public class Company {
     // Data fields
     private final CompanyDescription companyDescription;
     private final Set<Tag> tags = new HashSet<>();
-    private final Set<Internship> internships = new HashSet<>();
+    private final UniqueInternshipList internships;
 
     /**
+     * Constructs a company without any Internships.
      * Every field must be present and not null.
      */
     public Company(CompanyName companyName, CompanyPhone phone,
                    CompanyEmail email, CompanyDescription companyDescription,
-                   Set<Tag> tags, Set<Internship> internships) {
-        requireAllNonNull(companyName, phone, email, companyDescription, tags, internships);
+                   Set<Tag> tags) {
+        requireAllNonNull(companyName, phone, email, companyDescription, tags);
         this.companyName = companyName;
         this.phone = phone;
         this.email = email;
         this.companyDescription = companyDescription;
         this.tags.addAll(tags);
-        this.internships.addAll(internships);
+        this.internships = new UniqueInternshipList();
+    }
+
+    /**
+     * Constructs a Company with a given List of Internships.
+     * Every field must be present and not null.
+     */
+    public Company(CompanyName companyName, CompanyPhone phone,
+                   CompanyEmail email, CompanyDescription companyDescription,
+                   Set<Tag> tags, List<Internship> internships) {
+        requireAllNonNull(companyName, phone, email, companyDescription, tags);
+        this.companyName = companyName;
+        this.phone = phone;
+        this.email = email;
+        this.companyDescription = companyDescription;
+        this.tags.addAll(tags);
+        this.internships = new UniqueInternshipList();
+
+        for (Internship i : internships) {
+            this.internships.add(i);
+        }
     }
 
     public CompanyName getCompanyName() {
@@ -74,11 +93,39 @@ public class Company {
     }
 
     /**
-     * Returns an immutable internship set, which throws {@code UnsupportedOperationException}
-     * if modification is attempted.
+     * Adds an internship to the company in the address book.
+     * The internship must not already exist in the address book.
      */
-    public Set<Internship> getInternships() {
-        return Collections.unmodifiableSet(internships);
+    public void addInternship(Internship toAdd) {
+        internships.add(toAdd);
+    }
+
+    /**
+     * Returns true if the comapany already has this internship.
+     */
+    public boolean hasInternship(Internship internship) {
+        return this.internships.contains(internship);
+    }
+
+    /**
+     * Returns the Internship at the specified index.
+     */
+    public Internship getInternshipAtIndex(int i) {
+        return this.internships.get(i);
+    }
+
+    /**
+     * Sets the Internship at {@code target} with {@code internship}.
+     */
+    public void setInternship(Internship target, Internship internship) {
+        this.internships.setInternship(target, internship);
+    }
+
+    /**
+     * Returns an ObservableList of internships.
+     */
+    public ObservableList<Internship> getInternshipList() {
+        return internships.asUnmodifiableObservableList();
     }
 
     /**
@@ -87,12 +134,25 @@ public class Company {
      * @return The most urgent Internship.
      */
     public Optional<Internship> getMostUrgentInternship() {
-        return internships.stream()
-                .filter(internship -> internship.getInternshipDateTime().isPresent())
-                .min(Comparator.comparing(internship -> internship.getInternshipDateTime().get()))
-                .or(() -> internships.stream()
-                        .filter(internship -> internship.getInternshipDateTime().isEmpty())
-                        .findFirst());
+        LocalDateTime now = LocalDateTime.now();
+        Optional<Internship> mostUrgent = Optional.empty();
+
+        for (Internship internship : internships.asUnmodifiableObservableList()) {
+            Optional<InternshipInterviewDateTime> interviewDateTime = internship.getInternshipDateTime();
+
+            if (interviewDateTime.isPresent()) {
+                LocalDateTime interviewDate = interviewDateTime.get().getInternshipDateTime();
+
+                if (interviewDate.isAfter(now)) {
+                    if (mostUrgent.isEmpty() || interviewDate.isBefore(mostUrgent.get().getInternshipDateTime()
+                            .get().getInternshipDateTime())) {
+                        mostUrgent = Optional.of(internship);
+                    }
+                }
+            }
+        }
+
+        return mostUrgent;
     }
 
     /**
@@ -101,27 +161,7 @@ public class Company {
      * @return The ObservableList of Internship objects under this company.
      */
     public ObservableList<Internship> getInternshipsAsSortedObservableList() {
-        // Create a list from the set
-        List<Internship> internshipsList = new ArrayList<>(internships);
-
-        // Sort the list based on the internship date (if available)
-        internshipsList.sort((internship1, internship2) -> {
-            Optional<InternshipInterviewDateTime> dateTime1 = internship1.getInternshipDateTime();
-            Optional<InternshipInterviewDateTime> dateTime2 = internship2.getInternshipDateTime();
-
-            if (dateTime1.isPresent() && dateTime2.isPresent()) {
-                return dateTime1.get().compareTo(dateTime2.get());
-            } else if (dateTime1.isPresent()) {
-                return -1; // internship1 has a date, so it comes before internship2
-            } else if (dateTime2.isPresent()) {
-                return 1; // internship2 has a date, so it comes before internship1
-            } else {
-                return 0; // both internships have no date, keep their order
-            }
-        });
-
-        // Convert the sorted list back to an ObservableList
-        return FXCollections.observableArrayList(internshipsList);
+        return this.internships.getInternshipsAsSortedObservableList();
     }
 
     /**
@@ -174,7 +214,7 @@ public class Company {
      */
     public String toStringInternships() {
         StringBuilder result = new StringBuilder("[");
-        for (Internship i : this.internships) {
+        for (Internship i : this.internships.asUnmodifiableObservableList()) {
             result.append(i.toString()).append(", ");
         }
 

@@ -1,7 +1,9 @@
 package seedu.address.testutil;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import seedu.address.model.company.Company;
@@ -28,7 +30,7 @@ public class CompanyBuilder {
     private CompanyEmail companyEmail;
     private CompanyDescription companyDescription;
     private Set<Tag> tags;
-    private Set<Internship> internships;
+    private List<Internship> internships;
 
     /**
      * Creates a {@code CompanyBuilder} with the default details.
@@ -39,19 +41,20 @@ public class CompanyBuilder {
         companyEmail = new CompanyEmail(DEFAULT_EMAIL);
         companyDescription = new CompanyDescription(DEFAULT_DESCRIPTION);
         tags = new HashSet<>();
-        internships = new HashSet<>();
+        internships = new ArrayList<>();
     }
 
     /**
      * Initializes the CompanyBuilder with the data of {@code companyToCopy}.
      */
     public CompanyBuilder(Company companyToCopy) {
+        internships = new ArrayList<>();
         companyName = companyToCopy.getCompanyName();
         companyPhone = companyToCopy.getCompanyPhone();
         companyEmail = companyToCopy.getCompanyEmail();
         companyDescription = companyToCopy.getCompanyDescription();
         tags = new HashSet<>(companyToCopy.getTags());
-        internships = new HashSet<>(companyToCopy.getInternships());
+        internships.addAll(companyToCopy.getInternshipList());
     }
 
     /**
@@ -82,7 +85,7 @@ public class CompanyBuilder {
     /**
      * Sets the {@code internships} to the {@code Company} that we are building.
      */
-    public CompanyBuilder withInternships(Set<Internship> internships) {
+    public CompanyBuilder withInternships(List<Internship> internships) {
         this.internships = internships;
         return this;
     }
@@ -91,7 +94,7 @@ public class CompanyBuilder {
      * Removes the {@code Set<Internship>} from the {@code Company} that we are building.
      */
     public CompanyBuilder withoutInternships() {
-        this.internships = new HashSet<>();
+        this.internships = new ArrayList<>();
         return this;
     }
 

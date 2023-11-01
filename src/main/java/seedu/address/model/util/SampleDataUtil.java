@@ -3,8 +3,9 @@ package seedu.address.model.util;
 import static seedu.address.model.util.CompanySampleDataUtil.getSampleCompanies;
 import static seedu.address.model.util.PersonSampleDataUtil.getSamplePersons;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public class SampleDataUtil {
     /**
      * Returns an internship set based the list of maps given.
      */
-    public static Set<Internship> getInternshipSet(Internship... internship) {
-        return new HashSet<>(Arrays.asList(internship));
+    public static List<Internship> getInternshipList(Internship... internship) {
+        return new ArrayList<>(Arrays.asList(internship));
     }
 }
